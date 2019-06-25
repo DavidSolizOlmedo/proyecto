@@ -43,8 +43,8 @@ var valid = {
     return true;
   },
 
-  checknumber : function (price){
-      if(isNaN(price)){
+  checknumber : function (number){
+      if(isNaN(number)){
         return false;
       }
       return true;
@@ -58,6 +58,5 @@ var valid = {
     return true;
 
   },
-
 };
 module.exports = valid;
