@@ -2,8 +2,10 @@ var express = require('express');
 const user = require ('../database/user');
 const USER = user.model;
 const USERSCHEMA = user.schema;
+const product = require ('../database/product');
+const PRODUCT = product.model;
+const PRODUCTSCHEMA = product.schema;
 var valid = require("../utils/valid");
-const PRODUCT = require ('../database/product');
 var router = express.Router();
 
 /* GET home page. */
@@ -23,7 +25,6 @@ router.post('/user', async(req, res) => {
     })
     return;
   }
-
   if(!valid.checkfullname(params.name)){
     res.status(300).json({
       msn : "El parametro name debe contener al menos 3 caracteres"
@@ -93,14 +94,47 @@ router.get("/user",(req, res)=>{
 });
 
 
-router.post('/product', (req, res) => {
+router.post('/product', async(req, res) => {
   var params = req.body;
   params["registerdate"] = new Date();
-  var user = new PRODUCT(params);
-  user.save().then(()=>{
-    res.status(200).json({
-      msn : "producto creado"
+  if(!valid.checkparams(PRODUCTSCHEMA, params)){
+    res.status(300).json({
+      msn : "parametros incorrecto"
     })
-  });
+    return;
+  }
+
+  if(!valid.checknameproduct(params.title)){
+    res.status(300).json({
+      msn : "El titulo del anuncio debe contener al menos 3 letras"
+    })
+    return;
+  }
+  if(!valid.checknumber(params.price)){
+    res.status(300).json({
+      msn : "El precio debe ser un numero"
+    })
+    return;
+  }
+  if(!valid.checknumber(params.cant)){
+    res.status(300).json({
+      msn : "La cantidad debe ser un numero"
+    })
+    return;
+  }
+  if(!valid.checkdetails(params.details)){
+    res.status(300).json({
+      msn : "El detalle del producto debe contener al menos 3 caracteres"
+    })
+    return;
+  }
+  var product = new PRODUCT(params);
+  var result = await product.save();
+  res.status(200).json(result);
+  res.status(300).json({
+    msn : "Variables incorrectas"
+  })
+
 });
+
 module.exports = router;
